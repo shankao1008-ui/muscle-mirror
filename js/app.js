@@ -315,7 +315,7 @@ async function fetchFableSummary(set) {
       $("summary-source").textContent = `本機規則摘要（${data.error || "Fable 不可用"}）`;
     }
   } catch {
-    $("summary-source").textContent = "本機規則摘要（伺服器未啟動）";
+    $("summary-source").textContent = "本機規則摘要（此部署未連接 Fable 伺服器）";
   }
 }
 
@@ -327,7 +327,7 @@ $("btn-ask").addEventListener("click", async () => {
     const r = await fetch("/api/ask", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ set: compactSet(currentSet), question: q }) });
     const data = await r.json();
     out.textContent = data.ok ? data.text : `Fable 不可用（${data.error}）。可先用「回放比較」直接查看兩次動作的差異表。`;
-  } catch { out.textContent = "伺服器未啟動，無法詢問 Fable。可先用「回放比較」查看差異表。"; }
+  } catch { out.textContent = "此部署未連接 Fable 伺服器，無法詢問。可先用「回放比較」直接查看兩次動作的差異表。"; }
 });
 $("ask-input").addEventListener("keydown", (e) => { if (e.key === "Enter") $("btn-ask").click(); });
 
