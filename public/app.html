@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Muscle Mirror App｜訓練</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <a class="logo" href="./" title="回到首頁">◐</a>
+      <div>
+        <h1>Muscle Mirror</h1>
+        <p class="tagline">看見動作 → 理解肌肉 → 發現變化 → 累積紀錄</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-view="train">訓練</button>
+      <button class="tab" data-view="replay" id="tab-replay" disabled>回放比較</button>
+      <button class="tab" data-view="history">長期紀錄</button>
+    </nav>
+  </header>
+
+  <!-- ============ TRAIN VIEW ============ -->
+  <main id="view-train" class="view active">
+    <!-- Step 1: setup -->
+    <section class="card setup" id="setup-card">
+      <h2>1. 建立本次訓練條件</h2>
+      <div class="setup-grid">
+        <label>動作
+          <select id="exercise">
+            <option value="dumbbell-curl">啞鈴二頭彎舉（單側）</option>
+          </select>
+        </label>
+        <label>訓練側
+          <select id="side">
+            <option value="right">右手</option>
+            <option value="left">左手</option>
+          </select>
+        </label>
+        <label>單手重量 (kg)
+          <input id="weight" type="number" min="0" step="0.5" value="6" />
+        </label>
+        <label>攝影機
+          <select id="camera"></select>
+        </label>
+      </div>
+      <p class="hint">請把手機或電腦放在側前方約 1.5–2 公尺處，確認<strong>肩膀、手肘、手腕與軀幹</strong>清楚入鏡。</p>
+      <label class="check"><input id="keep-video" type="checkbox" /> 保留本組原始影片（結束後可下載，預設只保存動作數據與虛擬回放）</label>
+      <div class="row">
+        <button id="btn-start-camera" class="primary">開啟攝影機</button>
+        <button id="btn-demo" class="ghost" title="不使用攝影機，載入一組合成的示範數據">載入示範資料（標示為示範）</button>
+      </div>
+    </section>
+
+    <!-- Step 2: live -->
+    <section class="live" id="live" hidden>
+      <div class="pane camera-pane">
+        <div class="pane-head">
+          <span>真人畫面</span>
+          <span id="track-quality" class="badge neutral">等待攝影機</span>
+        </div>
+        <div class="video-wrap">
+          <video id="video" playsinline muted autoplay></video>
+          <canvas id="overlay"></canvas>
+          <div id="track-hint" class="track-hint"></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="label">肘角</span><span id="stat-angle" class="value">—</span></div>
+          <div class="stat"><span class="label">次數</span><span id="stat-reps" class="value">0</span></div>
+          <div class="stat"><span class="label">階段</span><span id="stat-phase" class="value">準備</span></div>
+          <div class="stat"><span class="label">上次幅度</span><span id="stat-rom" class="value">—</span></div>
+          <div class="stat"><span class="label">上次節奏</span><span id="stat-tempo" class="value">—</span></div>
+        </div>
+      </div>
+
+      <div class="pane model-pane">
+        <div class="pane-head">
+          <span>虛擬肌肉模型 <em class="sim">模擬</em></span>
+          <div class="seg" id="arm-view">
+            <button data-mode="muscle" class="on">肌肉</button>
+            <button data-mode="skeleton">骨骼</button>
+            <button data-mode="mechanics">力學</button>
+          </div>
+        </div>
+        <canvas id="arm" class="arm-canvas"></canvas>
+        <p class="legend" id="arm-legend">顏色表示動作模型中的<strong>預期參與角色</strong>，不是量測到的活化程度。</p>
+      </div>
+
+      <div class="cuebar">
+        <div id="cue" class="cue">請完成校準後開始。</div>
+        <div class="row">
+          <button id="btn-calibrate" class="primary">姿態校準（手臂自然下垂 3 秒）</button>
+          <button id="btn-start-set" class="primary" disabled>開始本組</button>
+          <button id="btn-end-set" class="danger" disabled>結束本組</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 4: between sets -->
+    <section class="card" id="post-set" hidden>
+      <h2>4. 組間：記錄疲勞線索</h2>
+      <p class="muted" id="post-set-meta"></p>
+      <div id="video-download" class="row" hidden></div>
+      <div id="compare-table"></div>
+      <div class="questions">
+        <label>這組有多吃力？（1–10）
+          <div class="slider-row">
+            <input id="rpe" type="range" min="1" max="10" value="7" />
+            <output id="rpe-out">7</output>
+          </div>
+        </label>
+        <label>你覺得還能再做幾下？
+          <input id="rir" type="number" min="0" max="20" value="2" />
+        </label>
+        <label>註記（選填，例如：後段刻意放慢）
+          <input id="note" type="text" placeholder="速度變慢也可能是刻意放慢節奏" />
+        </label>
+      </div>
+      <div class="row">
+        <button id="btn-save" class="primary">產生紀錄卡並儲存</button>
+        <button id="btn-discard" class="ghost">捨棄本組</button>
+      </div>
+    </section>
+
+    <!-- Step 5: record card -->
+    <section class="card record" id="record-card" hidden>
+      <h2>5. 訓練紀錄卡</h2>
+      <div id="record-body"></div>
+      <div class="summary">
+        <div class="summary-head">
+          <strong>本組摘要</strong>
+          <span id="summary-source" class="badge neutral">本機規則</span>
+        </div>
+        <p id="summary-text"></p>
+        <div class="ask">
+          <input id="ask-input" type="text" placeholder="問 Fable：第 2 次和第 9 次有什麼不同？" />
+          <button id="btn-ask" class="ghost">詢問</button>
+        </div>
+        <p id="ask-answer" class="answer" hidden></p>
+      </div>
+      <div class="row">
+        <button id="btn-open-replay" class="primary">回放比較</button>
+        <button id="btn-new-set" class="ghost">再做一組</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ REPLAY VIEW ============ -->
+  <main id="view-replay" class="view">
+    <section class="card">
+      <h2>3. 虛擬環境：回放並理解這一下</h2>
+      <p class="muted">選兩次動作並排慢速播放。拖曳時間軸可停在任一瞬間。</p>
+      <div class="replay-controls">
+        <label>A：第 <select id="rep-a"></select> 次</label>
+        <label>B：第 <select id="rep-b"></select> 次</label>
+        <label>速度
+          <select id="replay-speed">
+            <option value="0.25">0.25×</option>
+            <option value="0.5" selected>0.5×</option>
+            <option value="1">1×</option>
+          </select>
+        </label>
+        <div class="seg" id="replay-view">
+          <button data-mode="muscle" class="on">肌肉</button>
+          <button data-mode="skeleton">骨骼</button>
+          <button data-mode="mechanics">力學</button>
+        </div>
+        <button id="btn-play" class="primary">▶ 播放</button>
+      </div>
+      <div class="replay-grid">
+        <div class="replay-pane">
+          <div class="pane-head"><span id="label-a">A</span></div>
+          <canvas id="arm-a" class="arm-canvas"></canvas>
+        </div>
+        <div class="replay-pane">
+          <div class="pane-head"><span id="label-b">B</span></div>
+          <canvas id="arm-b" class="arm-canvas"></canvas>
+        </div>
+      </div>
+      <input id="timeline" type="range" min="0" max="1000" value="0" />
+      <canvas id="angle-chart" height="160"></canvas>
+      <div id="replay-diff"></div>
+    </section>
+  </main>
+
+  <!-- ============ HISTORY VIEW ============ -->
+  <main id="view-history" class="view">
+    <section class="card">
+      <h2>6. 長期紀錄</h2>
+      <p class="muted">比較優先選擇相同動作、相同訓練側、相同重量的紀錄。肌肉地圖只顯示「安排過訓練」，不解讀恢復或生長。</p>
+      <div id="history-compare" class="history-compare"></div>
+      <div id="muscle-map" class="muscle-map"></div>
+      <div id="history-list" class="history-list"></div>
+      <div class="row">
+        <button id="btn-export" class="ghost">匯出 JSON</button>
+        <button id="btn-clear" class="danger ghost">清除所有紀錄</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>骨架追蹤：MediaPipe Pose（裝置端）。角度與次數由程式計算。Fable 只讀結構化數據，不看影片。</span>
+  </footer>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

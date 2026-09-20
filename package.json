@@ -1,0 +1,18 @@
+{
+  "name": "muscle-mirror",
+  "version": "0.1.0",
+  "description": "Muscle Mirror — see every rep. Build Day prototype: single-arm dumbbell curl tracking, virtual muscle arm, set comparison, record cards.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.127.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
