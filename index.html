@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Muscle Mirror｜看見每一下訓練</title>
+  <meta name="description" content="Muscle Mirror 結合攝影機、虛擬肌肉模型與訓練日誌。看見動作、理解目標肌群、發現每一組的變化，並記住身體表現如何改變。" />
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="lp">
+  <header class="lp-nav">
+    <a class="lp-brand" href="./"><span class="logo">◐</span> Muscle Mirror</a>
+    <nav>
+      <a href="#concept">概念</a>
+      <a href="#views">模擬視圖</a>
+      <a href="#flow">訓練流程</a>
+      <a href="#card">紀錄卡</a>
+      <a href="#principles">原則</a>
+      <a href="#fable">Fable</a>
+    </nav>
+    <a class="btn primary" href="./app.html">進入 App</a>
+  </header>
+
+  <!-- HERO -->
+  <section class="lp-hero">
+    <div class="lp-hero-copy">
+      <p class="eyebrow">MUSCLE MIRROR · 看見每一下訓練</p>
+      <h1>看見動作，<br />理解肌肉，<br />記住身體的變化。</h1>
+      <p class="lead">把手機放在旁邊開始運動。Muscle Mirror 辨識動作，讓虛擬身體同步活動，顯示目標肌群與收縮階段；每組結束後，把動作幅度、節奏、姿勢變化與你的自評整理成一張看得懂的紀錄卡。</p>
+      <div class="lp-cta">
+        <a class="btn primary lg" href="./app.html">開始訓練</a>
+        <a class="btn ghost lg" href="./app.html?demo=1">先看示範資料</a>
+      </div>
+      <ul class="lp-trust">
+        <li>骨架追蹤在裝置端完成</li>
+        <li>原始影片預設不保存</li>
+        <li>所有肌肉動畫標示「模擬」</li>
+      </ul>
+    </div>
+    <div class="lp-hero-visual">
+      <div class="lp-canvas-card">
+        <div class="lp-canvas-head">
+          <span>虛擬肌肉模型 <em class="sim">模擬</em></span>
+          <div class="seg" id="hero-view">
+            <button data-mode="muscle" class="on">肌肉</button>
+            <button data-mode="skeleton">骨骼</button>
+            <button data-mode="mechanics">力學</button>
+          </div>
+        </div>
+        <canvas id="hero-arm" class="arm-canvas"></canvas>
+        <div class="lp-readout">
+          <div><span class="label">肘角</span><span id="hero-angle" class="value">—</span></div>
+          <div><span class="label">階段</span><span id="hero-phase" class="value">準備</span></div>
+          <div><span class="label">次數</span><span id="hero-reps" class="value">0</span></div>
+          <div><span class="label">節奏</span><span id="hero-tempo" class="value">—</span></div>
+        </div>
+      </div>
+      <p class="lp-caption">示意動畫：以合成角度驅動。實際使用時由攝影機追蹤到的肩、肘、腕位置即時驅動。</p>
+    </div>
+  </section>
+
+  <!-- CONCEPT -->
+  <section class="lp-section" id="concept">
+    <h2>核心體驗</h2>
+    <div class="lp-steps">
+      <div class="lp-step"><span class="num">01</span><h3>看見動作</h3><p>真人畫面與骨架標記，顯示肩、肘、腕位置、次數、動作幅度與節奏。追蹤品質不足時暫停評估，不把追蹤錯誤寫成動作問題。</p></div>
+      <div class="lp-step"><span class="num">02</span><h3>理解肌肉</h3><p>同步活動的虛擬手臂，標示目標肌群與抬起、停留、放下三個階段。顏色代表動作模型中的預期參與角色，不是量測到的活化程度。</p></div>
+      <div class="lp-step"><span class="num">03</span><h3>發現變化</h3><p>把第 2 次與第 9 次並排慢放，看肘關節幅度、抬起與放下時間、手肘位移與軀幹晃動從哪一下開始不同。</p></div>
+      <div class="lp-step"><span class="num">04</span><h3>累積紀錄</h3><p>每組一張紀錄卡：可觀察的變化加上你的自評，形成「可能的疲勞線索」。長期只比較相同動作、相同重量與相近拍攝條件。</p></div>
+    </div>
+  </section>
+
+  <!-- VIEWS -->
+  <section class="lp-section" id="views">
+    <h2>三種模擬視圖</h2>
+    <p class="lp-sub">同一個量測到的肘角，用三種方式解釋。切換視圖不會改變資料，只改變你看它的角度。</p>
+    <div class="lp-views">
+      <figure>
+        <canvas id="view-muscle" class="arm-canvas"></canvas>
+        <figcaption><strong>肌肉視圖</strong>肱二頭肌、肱肌、肱橈肌、肱三頭肌與前臂肌群依階段以「預期參與程度」上色，並標示主動肌、協同肌與拮抗肌。</figcaption>
+      </figure>
+      <figure>
+        <canvas id="view-skeleton" class="arm-canvas"></canvas>
+        <figcaption><strong>骨骼視圖</strong>肱骨、尺骨與橈骨圍繞肘關節樞紐運動，直接顯示程式計算的關節角度。</figcaption>
+      </figure>
+      <figure>
+        <canvas id="view-mechanics" class="arm-canvas"></canvas>
+        <figcaption><strong>力學視圖</strong>依輸入重量與前臂姿勢計算的簡化外力矩 τ = m·g·L·cos φ，解釋負荷如何隨姿勢改變；不把外力矩轉換成個別肌肉的真實力量。</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- FLOW -->
+  <section class="lp-section" id="flow">
+    <h2>訓練流程</h2>
+    <div class="lp-flow">
+      <article><span class="tag">1 · 開始前</span><h3>建立本次訓練條件</h3><p>選擇動作、輸入單手重量與訓練側。App 引導放好手機、完成幾秒姿態校準，並直接提示「追蹤清楚」「請退後一些」或「手腕被遮住」。</p></article>
+      <article><span class="tag">2 · 訓練中</span><h3>真人畫面與虛擬身體同步</h3><p>即時回饋一次只出現一條：「目前第 6 次。」「這次活動幅度比前幾次小。」「手肘比前幾次更往前移。」只描述可觀察的變化。</p></article>
+      <article><span class="tag">3 · 虛擬環境</span><h3>回放並理解這一下</h3><p>拖曳時間軸放慢任何一次動作，兩個虛擬手臂並排播放，附肘角曲線與逐項差異表。</p></article>
+      <article><span class="tag">4 · 組間</span><h3>記錄疲勞線索，而非虛構疲勞數字</h3><p>比較同一組前段與後段的節奏、幅度與姿勢，再問兩個問題：「這組有多吃力？」「你覺得還能再做幾下？」速度變慢也可能是刻意放慢，保留註記原因的選項。</p></article>
+      <article><span class="tag">5 · 訓練後</span><h3>一張看得懂的紀錄卡</h3><p>每一項觀察都連回對應的動作片段。點任何一項，就跳到虛擬回放檢查。</p></article>
+      <article><span class="tag">6 · 長期</span><h3>追蹤表現如何改變</h3><p>「相同重量下，本週完成的次數增加，活動幅度保持相近。」肌肉地圖只顯示本週安排過訓練的目標肌群與組數。</p></article>
+    </div>
+  </section>
+
+  <!-- CARD -->
+  <section class="lp-section" id="card">
+    <div class="lp-card-demo">
+      <div>
+        <h2>一張看得懂的紀錄卡</h2>
+        <p class="lp-sub">以下為示意資料。每一行都是影像中可觀察到的變化，或你自己填寫的感受。</p>
+        <a class="btn primary" href="./app.html?demo=1">用示範資料走一遍</a>
+      </div>
+      <div class="lp-record">
+        <p class="title">右手啞鈴彎舉｜6 kg｜10 次 <span class="demo-flag">示意資料</span></p>
+        <ul>
+          <li>完成次數：10 次</li>
+          <li>後段抬起時間比前段增加 <span class="link">回放 2 vs 9</span></li>
+          <li>最後 2 次活動幅度縮小 <span class="link">回放 2 vs 9</span></li>
+          <li>第 8 次起，手肘前移增加 <span class="link">回放 6 vs 8</span></li>
+          <li>自評用力程度：8／10</li>
+          <li>自評剩餘次數：2 次</li>
+        </ul>
+        <div class="summary">
+          <div class="summary-head"><strong>本組摘要</strong><span class="badge good">Fable 摘要</span></div>
+          <p>本組後段的節奏與動作幅度出現變化，加上你回報較吃力，可能與疲勞有關。可以回放第 2 次與第 9 次，查看差異。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRINCIPLES -->
+  <section class="lp-section" id="principles">
+    <h2>我們堅持的原則</h2>
+    <div class="lp-principles">
+      <div><h3>不顯示未量測的數字</h3><p>沒有肌電感測器，就不顯示肌肉活化百分比，也不輸出「這一組增肌效果 90%」這類結論。</p></div>
+      <div><h3>模擬就標示模擬</h3><p>虛擬肌肉的形狀變化只是動畫，不代表正在測量肌肉體積或成長。每個畫面都有「模擬」標記。</p></div>
+      <div><h3>辨識不足就暫停</h3><p>肩、肘、腕任何一點被遮住或追蹤不穩，評估立刻暫停，避免把追蹤錯誤寫成動作問題。</p></div>
+      <div><h3>資料不足就說不足</h3><p>次數太少或條件不同，顯示「本組不適合比較」，而不是硬算一個分數。</p></div>
+    </div>
+  </section>
+
+  <!-- FABLE -->
+  <section class="lp-section" id="fable">
+    <div class="lp-two">
+      <div>
+        <h2>Fable 在產品中的角色</h2>
+        <p class="lp-sub">即時骨架追蹤由專用姿態模型處理，角度與次數由程式計算。Fable 只讀結構化的動作數據，負責整合與解釋。</p>
+        <ul class="lp-list">
+          <li>根據結構化動作數據，生成有依據的組後摘要。</li>
+          <li>回答「第 2 次和第 9 次有什麼不同？」</li>
+          <li>把觀察結果連回時間軸，讓你能檢查解釋。</li>
+          <li>資訊不足時說明缺少什麼，不自行補出肌肉狀態。</li>
+        </ul>
+      </div>
+      <div>
+        <h2>未來：加入肌電感測</h2>
+        <p class="lp-sub">進階版本可串接表面肌電感測器，把指定肌肉的電活動與動作時間軸同步。你會同時看到「身體如何移動」和「感測器記錄到什麼電活動」。</p>
+        <p class="lp-sub">這需要感測器位置引導、訊號品質檢查、個人校正與驗證研究，才會逐步建立肌肉活化與疲勞相關分析。</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="lp-foot">
+    <p class="lp-oneliner">「Muscle Mirror 讓你看見每一下怎麼動、理解目標肌群，並記住身體表現的變化。」</p>
+    <div class="lp-foot-row">
+      <span>骨架追蹤：MediaPipe Pose（裝置端）· 角度與次數由程式計算 · Fable 只讀結構化數據</span>
+      <a class="btn primary" href="./app.html">進入 App</a>
+    </div>
+  </footer>
+
+  <script type="module" src="./js/landing.js"></script>
+</body>
+</html>
