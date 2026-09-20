@@ -44,6 +44,15 @@ npm start
 
 ## 部署為靜態網站
 
+線上版本：https://shankao1008-ui.github.io/muscle-mirror/ （GitHub Pages 從 `gh-pages` 分支發佈，該分支即 `public/` 的內容）。
+
+更新網站：
+
+```bash
+git push            # 先推 main
+npm run deploy      # 把 public/ 推到 gh-pages
+```
+
 `public/` 可直接放到 GitHub Pages、Netlify 或 Vercel（攝影機需要 HTTPS）。沒有後端時 `/api/*` 會失敗，App 自動改用本機規則摘要並在來源標籤說明；其餘功能不受影響。
 
 ## 測試
